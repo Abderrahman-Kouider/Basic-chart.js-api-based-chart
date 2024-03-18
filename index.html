@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bitcoin Price Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+
+  <div>
+    <canvas id="myChart"></canvas>
+  </div>
+
+  <script>
+    async function fetchData() {
+    try {
+      const response = await fetch('https://api.coindesk.com/v1/bpi/historical/close.json');
+      const data = await response.json();
+      return data;
+    } catch {
+        console.error(error)
+    }
+    }
+
+    async function createChart() {
+      const apiData = await fetchData();
+      const dates = Object.keys(apiData.bpi);
+      const prices = Object.values(apiData.bpi);
+
+      const ctx = document.getElementById('myChart').getContext('2d');
+      const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'Bitcoin Price',
+            data: prices,
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                displayFormats: {
+                  quarter: 'MMM YYYY'
+                }
+              },
+              title: {
+                display: true,
+                text: 'Date'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Price'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    createChart();
+  </script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.30.1/date_fns.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</body>
+</html>
